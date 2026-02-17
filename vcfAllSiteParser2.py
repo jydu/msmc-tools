@@ -78,7 +78,7 @@ with gzip.open(input_vcf, "rt") if input_vcf.endswith(".gz") else open(input_vcf
                 else:
                     if genotypes[1] == ':':
                         # Haploid
-                        if genotypes[0] != '.'
+                        if genotypes[0] != '.':
                             mask_generators[chrom].addCalledPosition(pos)
                             if genotypes[0] == '1':
                                 vcf_files[chrom].write(line + "\n")
