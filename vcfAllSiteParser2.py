@@ -27,7 +27,7 @@ class MaskGenerator:
         self.file.close()
 
 if len(sys.argv) < 3:
-    print("Usage: ./vcfCaller.py <input_vcf> <output_prefix>")
+    print("Usage: ./vcfAllsiteParser2.py <input_vcf> <output_prefix>")
     print("Reads a VCF file, processes all chromosomes, and outputs separate mask BED files and filtered VCFs for each chromosome.")
     sys.exit(1)
 
@@ -65,14 +65,31 @@ with gzip.open(input_vcf, "rt") if input_vcf.endswith(".gz") else open(input_vcf
             for header in header_lines:
                 vcf_files[chrom].write(header)
             prev_chrom = chrom  # Update previous chromosome tracker
-        if line_cnt % 10000 == 0:
+        if line_cnt % 100000 == 0:
             sys.stderr.write(f"Parsing position {pos} on {chrom}\n")
         line_cnt += 1
         if re.match("^[ACTGactg]$", refAllele) and re.match("^[ACTGactg\.]$", altAllele):
-            if genotypes[0] != '.' and genotypes[2] != '.':
-                mask_generators[chrom].addCalledPosition(pos)
-                if genotypes[0] == '1' or genotypes[2] == '1':
-                    vcf_files[chrom].write(line + "\n")
+            if len(genotypes) >= 3:
+                if genotypes[1] == '/' or genotypes[1] == '|':
+                    if genotypes[0] != '.' and genotypes[2] != '.':
+                        mask_generators[chrom].addCalledPosition(pos)
+                        if genotypes[0] == '1' or genotypes[2] == '1':
+                            vcf_files[chrom].write(line + "\n")
+                else:
+                    if genotypes[1] == ':':
+                        # Haploid
+                        if genotypes[0] != '.'
+                            mask_generators[chrom].addCalledPosition(pos)
+                            if genotypes[0] == '1':
+                                vcf_files[chrom].write(line + "\n")
+                    else:
+                        print("Unrecognized genotype format: %s\n" % genotypes) #Note: this could happen if we have more than 9 variants at that position (!)
+            else:
+                # Haploid
+                if genotypes[0] != '.'
+                    mask_generators[chrom].addCalledPosition(pos)
+                    if genotypes[0] == '1':
+                        vcf_files[chrom].write(line + "\n")
 
 if prev_chrom:
     vcf_files[prev_chrom].close()
