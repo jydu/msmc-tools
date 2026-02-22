@@ -150,7 +150,10 @@ class JoinedVcfIterator:
         
         for i, l in enumerate(self.current_lines):
             if i not in minIndices:
-                ordered_alleles.addGenotype(ref, ref, True)
+                if self.haploid:
+                    ordered_alleles.addGenotype(ref, "", True)
+                else:
+                    ordered_alleles.addGenotype(ref, ref, True)
             else:
                 alleles, geno, phased = l[2:5]
                 if self.haploid:
