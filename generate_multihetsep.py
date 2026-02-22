@@ -132,9 +132,10 @@ def unique(list_of_lists):
 
 class JoinedVcfIterator:
     def __init__(self, filenames, trios, as_phased, haploid):
-        self.vcfIterators = [VcfIterator(f, as_phased) for f in filenames]
+        self.vcfIterators = [VcfIterator(f, as_phased, haploid) for f in filenames]
         self.current_lines = [next(v) for v in self.vcfIterators]
         self.trios = trios
+        self.haploid = haploid
     
     def __iter__(self):
         return self
@@ -152,7 +153,10 @@ class JoinedVcfIterator:
                 ordered_alleles.addGenotype(ref, ref, True)
             else:
                 alleles, geno, phased = l[2:5]
-                ordered_alleles.addGenotype(alleles[geno[0]], alleles[geno[1]], phased)
+                if haploid:
+                    ordered_alleles.addGenotype(alleles[geno[0]], "", True)
+                else:
+                    ordered_alleles.addGenotype(alleles[geno[0]], alleles[geno[1]], phased)
                 try:
                     self.current_lines[i] = next(self.vcfIterators[i])
                 except StopIteration:
