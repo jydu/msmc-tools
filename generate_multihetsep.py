@@ -131,7 +131,7 @@ def unique(list_of_lists):
     return list(set([tuple(l) for l in list_of_lists]))
 
 class JoinedVcfIterator:
-    def __init__(self, filenames, trios, as_phased):
+    def __init__(self, filenames, trios, as_phased, haploid):
         self.vcfIterators = [VcfIterator(f, as_phased) for f in filenames]
         self.current_lines = [next(v) for v in self.vcfIterators]
         self.trios = trios
