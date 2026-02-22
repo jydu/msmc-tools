@@ -153,7 +153,7 @@ class JoinedVcfIterator:
                 ordered_alleles.addGenotype(ref, ref, True)
             else:
                 alleles, geno, phased = l[2:5]
-                if haploid:
+                if self.haploid:
                     ordered_alleles.addGenotype(alleles[geno[0]], "", True)
                 else:
                     ordered_alleles.addGenotype(alleles[geno[0]], alleles[geno[1]], phased)
